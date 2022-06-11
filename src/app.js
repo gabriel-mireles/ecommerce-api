@@ -1,10 +1,12 @@
+require("./utils/symbols/global.symbol");
+
 const morgan = require("morgan");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
 const apiV1 = require("./routes/api.v1");
-const notFoundMiddleware = require("./services/middlewares/not-found.middleware");
-const errorHandlerMiddleware = require("./services/middlewares/error-handler.middleware");
+const notFoundMiddleware = require("./middlewares/not-found.middleware");
+const errorHandlerMiddleware = require("./middlewares/error-handler.middleware");
 
 const app = express();
 

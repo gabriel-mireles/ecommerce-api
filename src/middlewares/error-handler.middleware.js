@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const mongoose = require("mongoose");
 
-const { API_RESPONSES } = require("../../utils");
+const { API_RESPONSES } = require("../utils");
 
 const DUPLICATE_ERROR_CODE = 11000;
 
