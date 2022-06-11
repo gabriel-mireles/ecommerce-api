@@ -1,7 +1,22 @@
 const { StatusCodes } = require("http-status-codes");
 
+const userModel = require("../../models/user/user.model");
+const { API_RESPONSES, jwtUtil } = require("../../utils");
+const CustomErrors = require("../../services/errors");
+
 async function httpRegister(req, res) {
-  res.status(StatusCodes.CREATED).json({ msg: "register route" });
+  const { name, email, password } = req.body;
+
+  const emailMatch = await userModel.findUser({ email });
+  if (emailMatch)
+    throw new CustomErrors.BadRequestError("Email already in use");
+
+  const user = await userModel.createUser({ name, email, password });
+
+  const payload = { userId: user._id, name: user.name, role: user.role };
+  jwtUtil.createTokenAndAttachCookies(res, payload);
+
+  res.status(StatusCodes.CREATED).json({ status: API_RESPONSES.SUCCESS });
 }
 
 async function httpLogin(req, res) {

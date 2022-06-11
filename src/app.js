@@ -1,5 +1,6 @@
 const morgan = require("morgan");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 
 const apiV1 = require("./routes/api.v1");
 const notFoundMiddleware = require("./services/middlewares/not-found.middleware");
@@ -9,6 +10,11 @@ const app = express();
 
 app.use(morgan("tiny"));
 app.use(express.json());
+app.use(cookieParser(process.env.COOKIE_SECRET));
+
+app.get("/api/v1", (req, res) => {
+  res.send("e-commerce api");
+});
 
 app.use("/api/v1", apiV1);
 
