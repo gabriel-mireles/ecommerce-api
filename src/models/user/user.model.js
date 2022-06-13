@@ -1,3 +1,4 @@
+const { CustomAPIErrors } = require("../../utils");
 const UserModelDB = require("./user.mongo");
 
 async function createUser(user) {
@@ -18,4 +19,37 @@ async function documentsCount(filter) {
   return await UserModelDB.countDocuments(filter);
 }
 
-module.exports = { createUser, findUser, findUsers, documentsCount };
+async function updateUser(_id, user) {
+  console.log(user)
+  return await UserModelDB.findOneAndUpdate({ _id }, user, {
+    new: true,
+    runValidators: true,
+  }).select("-password -__v");
+}
+
+async function updatePassword({ _id, newPassword, oldPassword }) {
+  const user = await findUser({ _id });
+
+  if (!user)
+    throw new CustomAPIErrors.NotFoundError(
+      `User with email ${email} not found`
+    );
+
+  const isOldPasswordCorrect = await user.comparePassword(oldPassword);
+
+  if (!isOldPasswordCorrect)
+    throw new CustomAPIErrors.UnauthenticatedError("Invalid credentials");
+
+  user.password = newPassword;
+  user.name = 'ptersito'
+  await user.save();
+}
+
+module.exports = {
+  createUser,
+  findUser,
+  findUsers,
+  documentsCount,
+  updateUser,
+  updatePassword,
+};

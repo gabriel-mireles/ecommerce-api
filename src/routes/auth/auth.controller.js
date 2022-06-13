@@ -13,7 +13,7 @@ async function httpRegister(req, res) {
 
   const user = await userModel.createUser({ name, email, password });
 
-  const payload = { userId: user._id, name: user.name, role: user.role };
+  const payload = jwtService.createUserTokenPayload(user);
   jwtService.createTokenAndAttachCookies(res, payload);
 
   res.status(StatusCodes.CREATED).json({ status: API_RESPONSES.SUCCESS });
@@ -35,7 +35,8 @@ async function httpLogin(req, res) {
   if (!isCorrectPassword)
     throw new CustomAPIErrors.UnauthenticatedError("Invalid Credentials");
 
-  const payload = { userId: user._id, name: user.name, role: user.role };
+  const payload = jwtService.createUserTokenPayload(user);
+
   jwtService.createTokenAndAttachCookies(res, payload);
 
   res.status(StatusCodes.OK).json({ status: API_RESPONSES.SUCCESS });

@@ -5,8 +5,8 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 
 const apiV1 = require("./routes/api.v1");
-const notFoundMiddleware = require("./middlewares/not-found.middleware");
-const errorHandlerMiddleware = require("./middlewares/error-handler.middleware");
+const notFoundMiddleware = require("./middlewares/errors/not-found.middleware");
+const errorHandlerMiddleware = require("./middlewares/errors/error-handler.middleware");
 
 const app = express();
 
