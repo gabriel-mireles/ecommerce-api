@@ -22,9 +22,14 @@ async function httpRegister(req, res) {
 async function httpLogin(req, res) {
   const { email, password } = req.body;
   if (!email || !password)
-    throw new CustomAPIErrors.BadRequestError("Please send an email and password");
+    throw new CustomAPIErrors.BadRequestError(
+      "Please send an email and password"
+    );
 
   const user = await userModel.findUser({ email });
+
+  if (!user) throw new CustomAPIErrors.BadRequestError("Invalid Credentials");
+
   const isCorrectPassword = await user.comparePassword(password);
 
   if (!isCorrectPassword)
@@ -37,7 +42,12 @@ async function httpLogin(req, res) {
 }
 
 async function httpLogout(req, res) {
-  res.status(StatusCodes.OK).json({ msg: "logout route" });
+  res.cookie("token", "logout", {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+
+  res.status(StatusCodes.OK).json({ status: API_RESPONSES.SUCCESS });
 }
 
 module.exports = {
