@@ -15,7 +15,7 @@ productRouter
   .get(productController.httpGetAllProducts)
   .post(authMiddlewares, productController.httpCreateProduct);
 
-productRouter.route("/uploadImage").post(authMiddlewares, productController.httpUploadImage);
+productRouter.route("/upload-image").post(authMiddlewares, productController.httpUploadImage);
 
 productRouter
   .route("/:id")
