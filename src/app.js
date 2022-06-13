@@ -1,7 +1,8 @@
 require("./utils/symbols/global.symbol");
 
-const path = require("path")
+const path = require("path");
 const morgan = require("morgan");
+const fs = require("fs").promises;
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
@@ -17,7 +18,15 @@ app.use(expressFileUpload());
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "uploads")));
+app.set("view engine", "hbs");
+app.set("views", path.join(__dirname, "public"));
+app.get("/", async (req, res) => {
+  const images = await fs.readdir(path.join(__dirname, "public", "uploads"));
+
+  console.log(images);
+  res.render("index", { images });
+});
 
 app.get("/api/v1", (req, res) => {
   res.send("e-commerce api");
