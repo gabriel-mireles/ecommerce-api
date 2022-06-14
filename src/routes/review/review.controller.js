@@ -1,12 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const ProductModel = require("../../models/product/product.model");
 const ReviewModel = require("../../models/review/review.model");
-const {
-  SYMBOLS_KEYS,
-  API_RESPONSES,
-  CustomAPIErrors,
-  checkUserPermissions,
-} = require("../../utils");
+const { SYMBOLS_KEYS, API_RESPONSES, CustomAPIErrors } = require("../../utils");
 
 async function httpGetReviews(req, res) {
   const reviews = await ReviewModel.getReviews();

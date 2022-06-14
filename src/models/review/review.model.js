@@ -16,8 +16,8 @@ async function doesReviewAlreadyExist(userId, productId) {
 
 async function getReviews() {
   return await ReviewModelDB.find()
-    .populate({ path: "product", select: "name company price" })
-    .populate({ path: "user", select: 'name' })
+    .populate({ path: "product", select: "name" })
+    .populate({ path: "user", select: "name" })
     .select("-__v");
 }
 
@@ -34,7 +34,7 @@ async function deleteReview(user, reviewId) {
     );
   }
 
-  checkUserPermissions(user.userId, review.user);
+  checkUserPermissions(user, review.user);
   await review.remove();
 }
 
@@ -47,12 +47,16 @@ async function updateReview(user, reviewId, newReview) {
     );
   }
 
-  checkUserPermissions(user.userId, review.user);
+  checkUserPermissions(user, review.user);
   review.rating = newReview.rating;
   review.comment = newReview.comment;
   review.title = newReview.title;
 
   return await review.save();
+}
+
+async function findReview(filter) {
+  return await ReviewModelDB.find(filter);
 }
 
 module.exports = {
@@ -62,4 +66,5 @@ module.exports = {
   getReviewById,
   deleteReview,
   updateReview,
+  findReview
 };

@@ -6,11 +6,13 @@ async function createProduct(product) {
 }
 
 async function getAllProducts() {
-  return await ProductModelDB.find().select("-__v");
+  return await ProductModelDB.find({}).select("-__v");
 }
 
 async function getProductById(_id) {
-  const product = await ProductModelDB.findOne({ _id }).select("-__v");
+  const product = await ProductModelDB.findOne({ _id })
+    .populate("reviews")
+    .select("-__v");
   if (!product) {
     throw new CustomAPIErrors.NotFoundError(
       `No product found with the id ${_id}`
@@ -47,7 +49,7 @@ async function deleteProduct(_id) {
     );
   }
 
-  await ProductModelDB.deleteOne({ _id }).select("-__v");
+  await product.remove();
   return;
 }
 

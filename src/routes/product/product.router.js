@@ -15,12 +15,18 @@ productRouter
   .get(productController.httpGetAllProducts)
   .post(authMiddlewares, productController.httpCreateProduct);
 
-productRouter.route("/upload-image").post(authMiddlewares, productController.httpUploadImage);
+productRouter
+  .route("/upload-image")
+  .post(authMiddlewares, productController.httpUploadImage);
 
 productRouter
   .route("/:id")
   .get(productController.httpGetSingleProduct)
   .patch(authMiddlewares, productController.httpUpdateProduct)
   .delete(authMiddlewares, productController.httpDeleteProduct);
+
+productRouter
+  .route("/:id/reviews")
+  .get(productController.getSingleProductReviews);
 
 module.exports = productRouter;

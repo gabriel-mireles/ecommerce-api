@@ -1,5 +1,6 @@
 const { SYMBOLS_KEYS, API_RESPONSES, CustomAPIErrors } = require("../../utils");
 const ProductModel = require("../../models/product/product.model");
+const ReviewModel = require("../../models/review/review.model");
 const { StatusCodes } = require("http-status-codes");
 const path = require("path");
 const fs = require("fs").promises;
@@ -53,7 +54,7 @@ async function httpUploadImage(req, res) {
     throw new CustomAPIErrors.BadRequestError("No image provided");
   }
 
-  console.log(image)
+  console.log(image);
   if (!image.mimetype.startsWith("image")) {
     throw new CustomAPIErrors.BadRequestError("Please upload an IMAGE");
   }
@@ -68,7 +69,18 @@ async function httpUploadImage(req, res) {
   const imagePath = path.resolve("src", "public", "uploads", image.name);
 
   await image.mv(imagePath);
-  res.status(StatusCodes.OK).json({data: `/uploads/${image.name}`, status: API_RESPONSES.SUCCESS })
+  res
+    .status(StatusCodes.OK)
+    .json({ data: `/uploads/${image.name}`, status: API_RESPONSES.SUCCESS });
+}
+
+async function getSingleProductReviews(req, res) {
+  const { id: productId } = req.params;
+  console.log(productId)
+  const reviews = await ReviewModel.findReview({ product: productId });
+  res
+    .status(StatusCodes.OK)
+    .json({ data: reviews, status: API_RESPONSES.SUCCESS });
 }
 
 module.exports = {
@@ -78,4 +90,5 @@ module.exports = {
   httpUpdateProduct,
   httpDeleteProduct,
   httpUploadImage,
+  getSingleProductReviews,
 };
