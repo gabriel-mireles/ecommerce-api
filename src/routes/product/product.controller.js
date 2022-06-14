@@ -1,9 +1,9 @@
-const { SYMBOLS_KEYS, API_RESPONSES, CustomAPIErrors } = require("../../utils");
-const ProductModel = require("../../models/product/product.model");
-const ReviewModel = require("../../models/review/review.model");
-const { StatusCodes } = require("http-status-codes");
 const path = require("path");
-const fs = require("fs").promises;
+const { StatusCodes } = require("http-status-codes");
+
+const ReviewModel = require("../../models/review/review.model");
+const ProductModel = require("../../models/product/product.model");
+const { SYMBOLS_KEYS, API_RESPONSES, CustomAPIErrors } = require("../../utils");
 
 async function httpCreateProduct(req, res) {
   const productToSave = req.body;
