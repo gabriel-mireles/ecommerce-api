@@ -1,7 +1,12 @@
 const { StatusCodes } = require("http-status-codes");
 const OrderModel = require("../../models/order/order.model");
 const ProductModel = require("../../models/product/product.model");
-const { SYMBOLS_KEYS, API_RESPONSES, CustomAPIErrors } = require("../../utils");
+const {
+  SYMBOLS_KEYS,
+  API_RESPONSES,
+  CustomAPIErrors,
+  checkUserPermissions,
+} = require("../../utils");
 
 //#region private methods
 
@@ -55,7 +60,8 @@ async function _fakeStripeAPI({ amount, currency }) {
 //#endregion
 
 async function httpGetAllOrders(req, res) {
-  res.send("httpGetOrders");
+  const orders = await OrderModel.getAllOrders();
+  res.status(StatusCodes.OK).json({ data: orders, status: API_RESPONSES.OK });
 }
 
 async function httpCreateOrder(req, res) {
@@ -81,25 +87,59 @@ async function httpCreateOrder(req, res) {
     user: user.userId,
   });
 
-  res
-    .status(StatusCodes.CREATED)
-    .json({ data: order, clientSecret: order.clientSecret });
+  res.status(StatusCodes.CREATED).json({
+    data: order,
+    clientSecret: order.clientSecret,
+    status: API_RESPONSES.OK,
+  });
 }
 
 async function httpGetCurrentUserOrders(req, res) {
-  res.send("httpGetCurrentUserOrders");
+  const user = req[Symbol.for(SYMBOLS_KEYS.USER)];
+  const orders = await OrderModel.getOrdersByUserId(user.userId);
+
+  if (!orders) {
+    throw new CustomAPIErrors.NotFoundError(
+      `No orders found with id: ${orderId}`
+    );
+  }
+
+  res.status(StatusCodes.OK).json({
+    data: orders,
+    status: API_RESPONSES.OK,
+  });
 }
 
 async function httpGetSingleOrder(req, res) {
-  res.send("httpGetSingleOrder");
+  const orderId = req.params.id;
+  const user = req[Symbol.for(SYMBOLS_KEYS.USER)];
+  const order = await OrderModel.getOrderById(orderId);
+
+  if (!order) {
+    throw new CustomAPIErrors.NotFoundError(
+      `No order found with id: ${orderId}`
+    );
+  }
+
+  checkUserPermissions(user, order.user);
+
+  res.status(StatusCodes.OK).json({
+    data: order,
+    status: API_RESPONSES.OK,
+  });
 }
 
 async function httpUpdateOrder(req, res) {
-  res.send("httpUpdateOrder");
-}
+  const orderId = req.params.id;
+  const paymentIntentId = req.body?.paymentIntentId;
 
-async function httpDeleteOrder(req, res) {
-  res.send("httpDeleteOrder");
+  if (!paymentIntentId) {
+    throw new CustomAPIErrors.BadRequestError("No payment intent provided")
+  }
+
+  const order = await OrderModel.updateOrderStatus(orderId, paymentIntentId);
+
+  res.status(StatusCodes.OK).json({data: order, status: API_RESPONSES.SUCCESS})
 }
 
 module.exports = {
@@ -108,5 +148,5 @@ module.exports = {
   httpGetCurrentUserOrders,
   httpGetSingleOrder,
   httpUpdateOrder,
-  httpDeleteOrder,
+
 };

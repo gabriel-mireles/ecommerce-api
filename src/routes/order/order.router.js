@@ -19,6 +19,5 @@ orderRouter
   .route("/:id")
   .get(orderController.httpGetSingleOrder)
   .patch(orderController.httpUpdateOrder)
-  .delete(orderController.httpDeleteOrder);
 
 module.exports = orderRouter;
